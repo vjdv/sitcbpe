@@ -24,7 +24,7 @@ public class InicioController implements Initializable {
     @FXML
     private TabPane tabs;
     @FXML
-    private TextField uriText;
+    private AutocompletionTextField uriText;
     @FXML
     private Label info;
     @FXML
@@ -108,7 +108,10 @@ public class InicioController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        uriText.setText("http://10.51.42.9:8080/SITCB/ProcesosEspeciales2");
+        //uriText.setText("http://10.51.42.9:8080/SITCB/ProcesosEspeciales2");
+        uriText.agregarSugerencia("http://10.51.42.9:8080/SITCB/ProcesosEspeciales");
+        uriText.agregarSugerencia("http://10.51.193.64:8080/SITCB/ProcesosEspeciales");
+        uriText.agregarSugerencia("http://10.228.128.214:8080/SITCB/ProcesosEspeciales");
         info.setText("");
     }
 
