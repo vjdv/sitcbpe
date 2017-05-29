@@ -12,6 +12,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 
 /**
+ * Permite tener un campo con
  *
  * @author B187926
  */
@@ -39,7 +40,7 @@ public class AutocompletionTextField extends TextField {
         });
     }
 
-    private List<String> buscarCoincidencias(String userInput) {
+    public List<String> lookForMatches(String userInput) {
         List<String> coincidencias = new ArrayList<>();
         if (userInput.trim().isEmpty() || entries.isEmpty()) {
             return coincidencias;
@@ -68,18 +69,40 @@ public class AutocompletionTextField extends TextField {
         return coincidencias;
     }
 
-    public void agregarSugerencia(String sugerencia) {
+    /**
+     * Adds a suggestion to be showed on user's input
+     *
+     * @param sugerencia
+     */
+    public void addSuggestion(String sugerencia) {
         entries.add(sugerencia);
     }
 
+    /**
+     * Sets max numbers of suggestions to show on user's input. Default 10.
+     *
+     * @param maxentries
+     */
     public void setMaxEntries(int maxentries) {
         maxEntries = maxentries;
     }
 
+    /**
+     * Sets search method, by default a suggestion is showed if it contains the
+     * user's input. Available methods are: contains, starts with, ends with,
+     * starts and ends with. Look for the static fields available in the class.
+     *
+     * @param method
+     */
     public void setSearchMethod(int method) {
         searchMethod = method;
     }
 
+    /**
+     * Sets if the search method must be case sentitive or not. False by default.
+     *
+     * @param flag
+     */
     public void setCaseSensitive(boolean flag) {
         caseSensitive = flag;
     }
@@ -88,7 +111,7 @@ public class AutocompletionTextField extends TextField {
 
         @Override
         public void changed(ObservableValue observable, String oldValue, String newValue) {
-            List<String> coincidencias = buscarCoincidencias(newValue);
+            List<String> coincidencias = lookForMatches(newValue);
             if (coincidencias.isEmpty()) {
                 entriesMenu.hide();
             } else {
@@ -96,7 +119,7 @@ public class AutocompletionTextField extends TextField {
                 for (String coincidencia : coincidencias) {
                     MenuItem item = new MenuItem(coincidencia);
                     entriesMenu.getItems().add(item);
-                    item.setOnAction(event->{
+                    item.setOnAction(event -> {
                         setText(coincidencia);
                         positionCaret(coincidencia.length());
                         entriesMenu.hide();

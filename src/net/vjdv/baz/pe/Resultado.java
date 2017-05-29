@@ -14,7 +14,7 @@ public class Resultado {
 
     @XmlElement(name = "RESULTSET")
     public List<String> resultsets = new ArrayList<>();
-    @XmlElement(name = "AFECTADOS")
+    @XmlElement(name = "COUNT")
     public List<String> afectados = new ArrayList<>();
     @XmlElement(name = "ERROR")
     public String error = null;
