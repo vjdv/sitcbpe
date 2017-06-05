@@ -5,15 +5,11 @@
  */
 package net.vjdv.baz.pe;
 
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Formatter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,30 +63,6 @@ public class Util {
             Logger.getLogger("Util").log(Level.WARNING, "Error al obtener IP", ex);
             return "127.0.0.1";
         }
-    }
-
-    public static String getToken(long timestamp) {
-        String temp = "SITCBTAS" + getCurrentMachineIP() + timestamp;
-        try {
-            MessageDigest crypt = MessageDigest.getInstance("SHA-256");
-            crypt.reset();
-            crypt.update(temp.getBytes("UTF-8"));
-            return byteToHex(crypt.digest());
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
-            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-            return "";
-        }
-    }
-
-    private static String byteToHex(final byte[] hash) {
-        String result;
-        try (Formatter formatter = new Formatter()) {
-            for (byte b : hash) {
-                formatter.format("%02x", b);
-            }
-            result = formatter.toString();
-        }
-        return result;
     }
 
 }

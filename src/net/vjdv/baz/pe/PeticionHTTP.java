@@ -10,13 +10,13 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.concurrent.Task;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import static net.vjdv.baz.pe.Util.getCurrentMachineIP;
 
 /**
  *
@@ -37,12 +37,11 @@ public class PeticionHTTP extends Task<Resultado> {
     public void enviarConsulta() {
         try {
             //Creando parámetros a enviar
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            String token = Util.getToken(timestamp.getTime());
+            Token token = new Token("SITCB" + getCurrentMachineIP());
             Map<String, Object> params = new HashMap<>();
             params.put("tran", query);
-            params.put("timestamp", timestamp.getTime());
-            params.put("token", token);
+            params.put("timestamp", token.getTimestamp());
+            params.put("token", token.get());
             byte[] postDataBytes = parsearPost(params);
             //Conectando con el servidor
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
