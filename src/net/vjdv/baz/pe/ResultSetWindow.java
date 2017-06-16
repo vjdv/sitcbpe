@@ -25,6 +25,8 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.fxmisc.richtext.demo.JavaKeywordsAsync;
 
 /**
  *
@@ -45,8 +47,9 @@ public class ResultSetWindow {
         ContextMenu menu = new ContextMenu();
         MenuItem mitem1 = new MenuItem("Copiar");
         MenuItem mitem2 = new MenuItem("Copiar con encabezados");
+        MenuItem mitem4 = new MenuItem("Expandir");
         MenuItem mitem3 = new MenuItem("Guardar como .csv");
-        menu.getItems().addAll(mitem1, mitem2, new SeparatorMenuItem(), mitem3);
+        menu.getItems().addAll(mitem1, mitem2, mitem4, new SeparatorMenuItem(), mitem3);
         tabla.setContextMenu(menu);
         //Acciones menú
         EventHandler<ActionEvent> listener = (ActionEvent event) -> {
@@ -109,6 +112,22 @@ public class ResultSetWindow {
                     alert.setContentText("Error al guardar el CSV: " + ex.toString());
                     alert.showAndWait();
                 }
+            }
+        });
+        mitem4.setOnAction(actionEvent -> {
+            ObservableList<TablePosition> positionList = tabla.getSelectionModel().getSelectedCells();
+            for (TablePosition position : positionList) {
+                int row = position.getRow();
+                int col = position.getColumn();
+                String data = (String) tabla.getColumns().get(col).getCellData(row);
+                ExpandedView view = new ExpandedView();
+                view.setText(data);
+                Scene scene2 = new Scene(view);
+                scene2.getStylesheets().add(JavaKeywordsAsync.class.getResource("xml-highlighting.css").toExternalForm());
+                Stage stage = new Stage();
+                stage.setTitle(tabla.getColumns().get(col).getText());
+                stage.setScene(scene2);
+                stage.show();
             }
         });
         //Interpretado de resultado
