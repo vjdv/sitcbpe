@@ -8,7 +8,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TextArea;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 
 /**
  *
@@ -18,12 +20,14 @@ public class Pestania extends Tab {
 
     private static int tabCount = 0;
     private File file;
-    private TextArea text;
+    private CodeArea text;
 
     public Pestania() {
         tabCount++;
-        text = new TextArea();
-        setContent(text);
+        text = new CodeArea();
+        text.setStyle("-fx-font-size: 13px;");
+        text.setParagraphGraphicFactory(LineNumberFactory.get(text));
+        setContent(new VirtualizedScrollPane<>(text));
         setText("Sin guardar " + tabCount);
     }
 
@@ -48,7 +52,7 @@ public class Pestania extends Tab {
             //StandardCharsets.UTF_8
             setText(file.getName());
             byte[] encoded = Files.readAllBytes(file.toPath());
-            text.setText(new String(encoded, Charset.defaultCharset()));
+            text.replaceText(new String(encoded, Charset.defaultCharset()));
         } catch (IOException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setContentText("Error al abrir el archivo: " + ex.toString());
@@ -56,7 +60,7 @@ public class Pestania extends Tab {
         }
     }
 
-    public TextArea getEditor() {
+    public CodeArea getEditor() {
         return text;
     }
 

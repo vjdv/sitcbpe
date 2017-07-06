@@ -36,6 +36,7 @@ public class ResultSetWindow {
 
     private final Scene scene;
     private final TableView<ObservableList<String>> tabla;
+    private int rowcount;
 
     public ResultSetWindow(String resultset) {
         AnchorPane root = new AnchorPane();
@@ -93,7 +94,7 @@ public class ResultSetWindow {
             if (!cabeceras.isEmpty()) {
                 cabeceras += "\n";
             }
-            final ClipboardContent clipboardContent = new ClipboardContent();
+            ClipboardContent clipboardContent = new ClipboardContent();
             clipboardContent.putString(cabeceras + clipboardString.toString());
             Clipboard.getSystemClipboard().setContent(clipboardContent);
         };
@@ -142,6 +143,7 @@ public class ResultSetWindow {
             tabla.getColumns().add(column);
         }
         while (lineas.hasMoreTokens()) {
+            rowcount++;
             String linea = lineas.nextToken();
             String values[] = linea.split("\t");
             List<String> items = new ArrayList<>();
@@ -158,6 +160,10 @@ public class ResultSetWindow {
 
     public Scene getScene() {
         return scene;
+    }
+
+    public int getRowCount() {
+        return rowcount;
     }
 
 }

@@ -122,7 +122,7 @@ public class InicioController implements Initializable {
                     ResultSetWindow rsw = new ResultSetWindow(rs);
                     Stage stage = new Stage();
                     stage.setScene(rsw.getScene());
-                    stage.setTitle("Salida " + salida_count);
+                    stage.setTitle("Salida " + salida_count + " (" + rsw.getRowCount() + " registros)");
                     stage.show();
                 }
                 String log = "";
