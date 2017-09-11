@@ -48,9 +48,12 @@ public class ResultSetWindow {
         ContextMenu menu = new ContextMenu();
         MenuItem mitem1 = new MenuItem("Copiar");
         MenuItem mitem2 = new MenuItem("Copiar con encabezados");
+        MenuItem mitem5 = new MenuItem("Copiar como INSERT SQL");
+        MenuItem mitem6 = new MenuItem("Copiar como UPDATE SQL");
         MenuItem mitem4 = new MenuItem("Expandir");
         MenuItem mitem3 = new MenuItem("Guardar como .csv");
-        menu.getItems().addAll(mitem1, mitem2, mitem4, new SeparatorMenuItem(), mitem3);
+        MenuItem mitem7 = new MenuItem("Guardar como .txt");
+        menu.getItems().addAll(mitem1, mitem2, mitem5, mitem6, mitem4, new SeparatorMenuItem(), mitem3, mitem7);
         tabla.setContextMenu(menu);
         //Acciones menú
         EventHandler<ActionEvent> listener = (ActionEvent event) -> {
@@ -65,13 +68,13 @@ public class ResultSetWindow {
                 }
                 int row = position.getRow();
                 int col = position.getColumn();
-                clipboardString.append(tabla.getColumns().get(col).getText());
                 if (prevRow == row) {
                     clipboardString.append("\t");
                 } else if (prevRow != -1) {
                     clipboardString.append("\n");
                     break;
                 }
+                clipboardString.append(tabla.getColumns().get(col).getText());
                 prevRow = row;
             }
             prevRow = -1;
@@ -129,6 +132,89 @@ public class ResultSetWindow {
                 stage.setTitle(tabla.getColumns().get(col).getText());
                 stage.setScene(scene2);
                 stage.show();
+            }
+        });
+        //Copiar como INSERT SQL
+        mitem5.setOnAction(actionEvent -> {
+            StringBuilder clipboardString = new StringBuilder();
+            ObservableList<TablePosition> positionList = tabla.getSelectionModel().getSelectedCells();
+            int prevRow = -1;
+            clipboardString.append("INSERT INTO @TABLE (");
+            for (TablePosition position : positionList) {
+                int row = position.getRow();
+                int col = position.getColumn();
+                if (prevRow == row) {
+                    clipboardString.append(",");
+                } else if (prevRow != -1) {
+                    clipboardString.append(") VALUES\n('");
+                    break;
+                }
+                clipboardString.append(tabla.getColumns().get(col).getText());
+                prevRow = row;
+            }
+            prevRow = -1;
+            for (TablePosition position : positionList) {
+                int row = position.getRow();
+                int col = position.getColumn();
+                Object cell = (Object) tabla.getColumns().get(col).getCellData(row);
+                if (cell == null) {
+                    cell = "";
+                }
+                if (prevRow == row) {
+                    clipboardString.append("','");
+                } else if (prevRow != -1) {
+                    clipboardString.append("'),\n('");
+                }
+                String text = cell.toString();
+                clipboardString.append(text);
+                prevRow = row;
+            }
+            clipboardString.append("');");
+            String x = clipboardString.toString().replaceAll("'null'", "null");
+            ClipboardContent clipboardContent = new ClipboardContent();
+            clipboardContent.putString(x);
+            Clipboard.getSystemClipboard().setContent(clipboardContent);
+        });
+        //Copiar como UPDATE SQL
+        mitem6.setOnAction(actionEvent -> {
+            StringBuilder clipboardString = new StringBuilder();
+            ObservableList<TablePosition> positionList = tabla.getSelectionModel().getSelectedCells();
+            int prevRow = -1;
+            for (TablePosition position : positionList) {
+                if (prevRow == -1) {
+                    clipboardString.append("UPDATE @TABLE SET\n");
+                }
+                int row = position.getRow();
+                int col = position.getColumn();
+                if (prevRow == row) {
+                    clipboardString.append(",\n");
+                } else if (prevRow != -1) {
+                    clipboardString.append("\nWHERE 1=0\n\n");
+                    break;
+                }
+                clipboardString.append(tabla.getColumns().get(col).getText()).append("=");
+                clipboardString.append("'").append(tabla.getColumns().get(col).getCellData(row)).append("'");
+                prevRow = row;
+            }
+            String x = clipboardString.toString().replaceAll("'null'", "null");
+            ClipboardContent clipboardContent = new ClipboardContent();
+            clipboardContent.putString(x);
+            Clipboard.getSystemClipboard().setContent(clipboardContent);
+        });
+        //Guardar como .txt
+        mitem7.setOnAction(actionEvent -> {
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Archivo de texto (*.txt)", "*.txt");
+            FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(extFilter);
+            File file = chooser.showSaveDialog(null);
+            if (file != null) {
+                try (PrintWriter out = new PrintWriter(file)) {
+                    out.print(resultset);
+                } catch (FileNotFoundException ex) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setContentText("Error al guardar el CSV: " + ex.toString());
+                    alert.showAndWait();
+                }
             }
         });
         //Interpretado de resultado

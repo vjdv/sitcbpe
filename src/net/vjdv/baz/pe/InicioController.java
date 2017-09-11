@@ -87,6 +87,15 @@ public class InicioController implements Initializable {
         new Thread(peticion).start();
     }
 
+    @FXML
+    private void ayuda() {
+        Alert alertDialog = new Alert(Alert.AlertType.INFORMATION);
+        alertDialog.setContentText("Desarrollado por B187926\n\nDudas y comentarios a:\nvdiaz@elektra.com.mx\nvjdv@outlook.com");
+        alertDialog.setHeaderText("Sobre la aplicación");
+        alertDialog.setTitle("Ayuda");
+        alertDialog.showAndWait();
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         uriText.setText("http://10.228.128.214:8080/SITCB/ProcesosEspeciales");
