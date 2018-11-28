@@ -2,4 +2,6 @@
 .settings
 .vscode
 bin
-build
+build/classes
+build/resources
+build/tmp
