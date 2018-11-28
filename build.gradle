@@ -1,0 +1,45 @@
+description = 'Procesos Especiales'
+version = '1.1'
+
+apply plugin: 'java'
+apply plugin:'application'
+
+sourceCompatibility = 1.8
+mainClassName = "net.vjdv.baz.pe.Main"
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+  compile 'org.fxmisc.richtext:richtextfx:0.9.2'
+}
+
+sourceSets {
+	main {
+		resources {
+        	srcDirs = ["src"]
+        	includes = ["**/*.fxml","**/*.png"]
+    	}
+		java {
+			srcDir 'src'
+		}
+	}
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'ObjectManager'
+    }
+}
+
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'ProcesosEspeciales',  
+        	'Implementation-Version': version,
+        	'Main-Class': 'net.vjdv.baz.pe.Main'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}

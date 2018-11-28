@@ -26,7 +26,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.fxmisc.richtext.demo.JavaKeywordsAsync;
+//import org.fxmisc.richtext.demo.JavaKeywordsAsync;
 
 /**
  *
@@ -127,7 +127,7 @@ public class ResultSetWindow {
                 ExpandedView view = new ExpandedView();
                 view.setText(data);
                 Scene scene2 = new Scene(view);
-                scene2.getStylesheets().add(JavaKeywordsAsync.class.getResource("xml-highlighting.css").toExternalForm());
+                //scene2.getStylesheets().add(JavaKeywordsAsync.class.getResource("xml-highlighting.css").toExternalForm());
                 Stage stage = new Stage();
                 stage.setTitle(tabla.getColumns().get(col).getText());
                 stage.setScene(scene2);
