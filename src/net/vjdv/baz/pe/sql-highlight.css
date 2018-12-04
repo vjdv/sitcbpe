@@ -10,6 +10,12 @@
 .number {
 	-fx-fill: #114411;
 }
+.func {
+	-fx-fill: #ff00ff;
+}
 .string {
 	-fx-fill: #ff0000;
+}
+.comment {
+	-fx-fill: #008000;
 }
