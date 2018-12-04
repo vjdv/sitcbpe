@@ -98,10 +98,11 @@ public class InicioController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        uriText.setText("http://10.228.128.214:8080/SITCB/ProcesosEspeciales");
-        uriText.addSuggestion("http://10.51.42.9:8080/SITCB/ProcesosEspeciales");
+        uriText.setText("http://10.228.128.214:8080/SITCB/ProcesosEspeciales/");
+        uriText.addSuggestion("http://10.51.42.9:8080/SITCB/ProcesosEspeciales/");
         uriText.addSuggestion("http://10.51.193.64:8080/SITCB/ProcesosEspeciales");
         uriText.addSuggestion("http://10.228.128.214:8080/SITCB/ProcesosEspeciales");
+        uriText.addSuggestion("http://10.51.42.9:8080/ReportosWS/services/ProcesosEspeciales");
         info.setText("");
     }
 

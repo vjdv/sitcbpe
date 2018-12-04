@@ -1,0 +1,15 @@
+.comment {
+	-fx-fill: teal;
+}
+.keyword {
+	-fx-fill: #0000ff;
+}
+.joiner {
+	-fx-fill: #808080;
+}
+.number {
+	-fx-fill: #114411;
+}
+.string {
+	-fx-fill: #ff0000;
+}

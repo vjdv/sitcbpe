@@ -20,6 +20,7 @@ public class Main extends Application {
         Parent root = loader.load(getClass().getResource("Inicio.fxml").openStream());
         InicioController controller = loader.<InicioController>getController();
         Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource("sql-highlight.css").toExternalForm());
         stage.setTitle("Procesos Especiales SITCB");
         stage.getIcons().add(new Image("/net/vjdv/baz/pe/logoSIT.png"));
         stage.setScene(scene);
