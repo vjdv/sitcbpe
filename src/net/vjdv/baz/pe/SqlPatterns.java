@@ -13,7 +13,7 @@ public class SqlPatterns {
 			"FROM", "WHERE", "ORDER BY", "GROUP BY", "HAVING", "DESC", "ASC", "TOP", "INTO", "VALUES", "WITH", "NOLOCK",
 			"CREATE", "ALTER", "PROCEDURE", "FUNCTION", "PIVOT", "ON", "FOR", "XML", "PATH", "ROOT", "AS", "BEGIN",
 			"END", "TRY", "CATCH", "GO", "DECLARE", "INT", "CHAR", "VARCHAR", "DECIMAL", "DATE", "DATETIME", "BIT",
-			"OUTPUT", "ADD", "NOT", "NULL", "DEFAULT" };
+			"OUTPUT", "ADD", "NOT", "NULL", "DEFAULT", "IF", "ELSE", "WHILE" };
 	private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + "|"
 			+ String.join("|", KEYWORDS).toLowerCase() + ")\\b";
 	private static final String[] JOINERS = new String[] { "IN", "AND", "OR", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN",
@@ -27,7 +27,7 @@ public class SqlPatterns {
 	private static final String STRING_PATTERN = "'([^']|'')*('|\\z)";
 	private static final String COMMENT_PATTERN = "(--.*?$)|(/\\*.*?\\*/)";
 
-	public static final Pattern PATTERN = Pattern.compile(
+	private static final Pattern PATTERN = Pattern.compile(
 			"(?<KEYWORD>" + KEYWORD_PATTERN + ")" + "|(?<JOINER>" + JOINER_PATTERN + ")" + "|(?<FUNC>" + FUNC_PATTERN
 					+ ")" + "|(?<STRING>" + STRING_PATTERN + ")" + "|(?<COMMENT>" + COMMENT_PATTERN + ")",
 			Pattern.MULTILINE | Pattern.DOTALL);
