@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.Set;
+
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,9 +17,11 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -26,6 +30,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import net.vjdv.baz.pe.Result.ResultPage;
 
 /**
  *
@@ -34,10 +39,10 @@ import javafx.stage.Stage;
 public class ResultSetWindow {
 
 	private final Scene scene;
-	private final TableView<ObservableList<String>> tabla;
+	private final TableView<ObservableList<Object>> tabla;
 	private int rowcount;
 
-	public ResultSetWindow(String resultset) {
+	public ResultSetWindow(ResultPage resultset) {
 		AnchorPane root = new AnchorPane();
 		root.setPrefSize(600, 400);
 		tabla = new TableView<>();
@@ -47,12 +52,15 @@ public class ResultSetWindow {
 		ContextMenu menu = new ContextMenu();
 		MenuItem mitem1 = new MenuItem("Copiar");
 		MenuItem mitem2 = new MenuItem("Copiar con encabezados");
-		MenuItem mitem5 = new MenuItem("Copiar como INSERT SQL");
-		MenuItem mitem6 = new MenuItem("Copiar como UPDATE SQL");
+		MenuItem mitem5 = new MenuItem("para INSERT");
+		MenuItem mitem6 = new MenuItem("para UPDATE");
+		MenuItem mitem8 = new MenuItem("para WHERE IN");
 		MenuItem mitem4 = new MenuItem("Expandir");
 		MenuItem mitem3 = new MenuItem("Guardar como .csv");
 		MenuItem mitem7 = new MenuItem("Guardar como .txt");
-		menu.getItems().addAll(mitem1, mitem2, mitem5, mitem6, mitem4, new SeparatorMenuItem(), mitem3, mitem7);
+		Menu mitem9 = new Menu("Copiar como sql...");
+		mitem9.getItems().addAll(mitem5, mitem6, mitem8);
+		menu.getItems().addAll(mitem1, mitem2, mitem9, mitem4, new SeparatorMenuItem(), mitem3, mitem7);
 		tabla.setContextMenu(menu);
 		// Acciones menú
 		EventHandler<ActionEvent> listener = (ActionEvent event) -> {
@@ -73,14 +81,14 @@ public class ResultSetWindow {
 					clipboardString.append("\n");
 					break;
 				}
-				clipboardString.append(tabla.getColumns().get(col).getText());
+				clipboardString.append(resultset.rows.get(row)[col]);
 				prevRow = row;
 			}
 			prevRow = -1;
 			for (TablePosition position : positionList) {
 				int row = position.getRow();
 				int col = position.getColumn();
-				Object cell = (Object) tabla.getColumns().get(col).getCellData(row);
+				Object cell = (Object) resultset.rows.get(row)[col];
 				if (cell == null) {
 					cell = "";
 				}
@@ -110,7 +118,7 @@ public class ResultSetWindow {
 			File file = chooser.showSaveDialog(null);
 			if (file != null) {
 				try (PrintWriter out = new PrintWriter(file)) {
-					out.print(resultset.replaceAll("\t", ","));
+					out.print(resultset.toString());
 				} catch (FileNotFoundException ex) {
 					Alert alert = new Alert(Alert.AlertType.ERROR);
 					alert.setContentText("Error al guardar el CSV: " + ex.toString());
@@ -136,43 +144,47 @@ public class ResultSetWindow {
 		});
 		// Copiar como INSERT SQL
 		mitem5.setOnAction(actionEvent -> {
+			StringBuilder insertString = new StringBuilder();
 			StringBuilder clipboardString = new StringBuilder();
 			ObservableList<TablePosition> positionList = tabla.getSelectionModel().getSelectedCells();
 			int prevRow = -1;
-			clipboardString.append("INSERT INTO @TABLE (");
+			insertString.append("INSERT INTO @TABLE (");
 			for (TablePosition position : positionList) {
 				int row = position.getRow();
 				int col = position.getColumn();
 				if (prevRow == row) {
 					clipboardString.append(",");
 				} else if (prevRow != -1) {
-					clipboardString.append(") VALUES\n('");
 					break;
 				}
-				clipboardString.append(tabla.getColumns().get(col).getText());
+				clipboardString.append(resultset.columns[col]);
 				prevRow = row;
 			}
+			insertString.append(") VALUES\n(");
+			clipboardString.append(insertString);
 			prevRow = -1;
 			for (TablePosition position : positionList) {
 				int row = position.getRow();
 				int col = position.getColumn();
-				Object cell = (Object) tabla.getColumns().get(col).getCellData(row);
-				if (cell == null) {
-					cell = "";
+				Object value = resultset.rows.get(row)[col];
+				if (value instanceof String) {
+					value = ((String) value).replaceAll("'", "'");
+					value = "'" + value + "'";
 				}
 				if (prevRow == row) {
-					clipboardString.append("','");
+					clipboardString.append(",");
 				} else if (prevRow != -1) {
-					clipboardString.append("'),\n('");
+					clipboardString.append("),\n(");
 				}
-				String text = cell.toString();
-				clipboardString.append(text);
+				clipboardString.append(value);
 				prevRow = row;
+				if (prevRow % 500 == 0) {
+					clipboardString.append(");\n").append(insertString);
+				}
 			}
-			clipboardString.append("');");
-			String x = clipboardString.toString().replaceAll("'null'", "null");
+			clipboardString.append(");");
 			ClipboardContent clipboardContent = new ClipboardContent();
-			clipboardContent.putString(x);
+			clipboardContent.putString(clipboardString.toString());
 			Clipboard.getSystemClipboard().setContent(clipboardContent);
 		});
 		// Copiar como UPDATE SQL
@@ -201,6 +213,33 @@ public class ResultSetWindow {
 			clipboardContent.putString(x);
 			Clipboard.getSystemClipboard().setContent(clipboardContent);
 		});
+		// Copiar WHERE IN
+		mitem8.setOnAction(actionEvent -> {
+			Set<String> values = new HashSet<>();
+			StringBuilder clipboardString = new StringBuilder("WHERE ");
+			ObservableList<TablePosition> positionList = tabla.getSelectionModel().getSelectedCells();
+			int prevCol = positionList.get(0).getColumn();
+			clipboardString.append(resultset.columns[prevCol]).append(" IN(");
+			for (TablePosition position : positionList) {
+				int row = position.getRow();
+				int col = position.getColumn();
+				if (prevCol != col) {
+					continue;
+				}
+				Object value = resultset.rows.get(row)[col];
+				if (value == null)
+					continue;
+				if (value instanceof String) {
+					value = ((String) value).replaceAll("'", "'");
+					value = "'" + value + "'";
+				}
+				values.add(value.toString());
+			}
+			clipboardString.append(String.join(",", values.toArray(new String[1]))).append(")");
+			ClipboardContent clipboardContent = new ClipboardContent();
+			clipboardContent.putString(clipboardString.toString());
+			Clipboard.getSystemClipboard().setContent(clipboardContent);
+		});
 		// Guardar como .txt
 		mitem7.setOnAction(actionEvent -> {
 			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Archivo de texto (*.txt)",
@@ -219,22 +258,37 @@ public class ResultSetWindow {
 			}
 		});
 		// Interpretado de resultado
-		StringTokenizer lineas = new StringTokenizer(resultset, "\r\n");
-		String l1 = lineas.nextToken();
-		String cols[] = l1.split("\t");
-		for (int i = 0; i < cols.length; i++) {
+		// StringTokenizer lineas = new StringTokenizer(resultset, "\r\n");
+		// String l1 = lineas.nextToken();
+		// String cols[] = l1.split("\t");
+		for (int i = 0; i < resultset.columns.length; i++) {
 			final int ifinal = i;
-			TableColumn<ObservableList<String>, String> column = new TableColumn<>(cols[ifinal]);
-			column.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().get(ifinal)));
+			TableColumn<ObservableList<Object>, Object> column = new TableColumn<>(resultset.columns[i]);
+			column.setCellFactory(col -> {
+				return new TableCell<ObservableList<Object>, Object>() {
+					@Override
+					protected void updateItem(Object item, boolean empty) {
+						super.updateItem(item, empty);
+						if (item == null && !empty) {
+							setText("null");
+							setStyle("-fx-background-color: #ffffe1");
+						} else if (!empty) {
+							setText(item.toString());
+						}
+					}
+				};
+			});
+			column.setCellValueFactory(param -> {
+				Object value = param.getValue().get(ifinal);
+				return new ReadOnlyObjectWrapper<>(value);
+			});
 			column.setMaxWidth(500);
 			tabla.getColumns().add(column);
 		}
-		while (lineas.hasMoreTokens()) {
+		for (Object[] row : resultset.rows) {
 			rowcount++;
-			String linea = lineas.nextToken();
-			String values[] = linea.split("\t");
-			List<String> items = new ArrayList<>();
-			items.addAll(Arrays.asList(values));
+			List<Object> items = new ArrayList<>();
+			items.addAll(Arrays.asList(row));
 			tabla.getItems().add(FXCollections.observableArrayList(items));
 		}
 		AnchorPane.setTopAnchor(tabla, 0d);

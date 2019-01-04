@@ -1,110 +1,74 @@
 package net.vjdv.baz.pe;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-import javafx.concurrent.Task;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import static net.vjdv.baz.pe.Util.getCurrentMachineIP;
+
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javafx.concurrent.Task;
 
 /**
  *
  * @author B187926
  */
-public class PeticionHTTP extends Task<Resultado> {
+public class PeticionHTTP extends Task<Result> {
 
-    private Resultado resultado = new Resultado();
-    private final String query;
-    private final URL url;
-    private String response;
+	private final String query;
+	private final URL url;
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public PeticionHTTP(URL url, String consulta) {
-        query = consulta;
-        this.url = url;
-    }
+	public PeticionHTTP(URL url, String consulta) {
+		query = consulta;
+		this.url = url;
+	}
 
-    public void enviarConsulta() {
-        try {
-            //Creando parámetros a enviar
-            Token token = new Token("SITCB" + getCurrentMachineIP());
-            Map<String, Object> params = new HashMap<>();
-            params.put("tran", query);
-            params.put("timestamp", token.getTimestamp());
-            params.put("token", token.get());
-            byte[] postDataBytes = parsearPost(params);
-            //Conectando con el servidor
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("charset", "utf-8");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty("Content-Length", Integer.toString(postDataBytes.length));
-            conn.setUseCaches(false);
-            //Enviando parámetros
-            conn.setDoOutput(true);
-            conn.getOutputStream().write(postDataBytes);
-            //Leyendo respuesta
-            String encoding = conn.getContentEncoding();
-            if (encoding == null) {
-                encoding = "ISO-8859-1";
-            }
-            int contentLength = conn.getContentLength();
-            int contentReaded = 0;
-            if (contentLength == -1) {
-                updateMessage("Leyendo respuesta");
-            }
-            Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), encoding));
-            StringBuilder sb = new StringBuilder();
-            for (int c; (c = in.read()) >= 0;) {
-                contentReaded++;
-                sb.append((char) c);
-                if (contentLength != -1) {
-                    updateProgress(contentReaded, contentLength);
-                    updateMessage("Leyendo respuesta " + Math.round(contentReaded * 100 / contentLength) + "%");
-                }
-            }
-            response = sb.toString();
-            //Convirtiendo respuesta en Resultado
-            JAXBContext jc = JAXBContext.newInstance(Resultado.class);
-            Unmarshaller m = jc.createUnmarshaller();
-            resultado = (Resultado) m.unmarshal(new StringReader(response));
-        } catch (ConnectException ex) {
-            resultado.error = "No se pudo establecer una conexión con el servidor";
-        } catch (JAXBException ex) {
-            resultado.error = "No es posible interpretar la respuesta del servidor: " + response;
-        } catch (IOException ex) {
-            resultado.error = ex.toString();
-        }
-    }
+	public Result enviarConsulta() {
+		Result result = new Result();
+		try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
+			// Creando parámetros a enviar
+			Token token = new Token("SITCB2" + getCurrentMachineIP());
+			HttpPost httppost = new HttpPost(url.toString());
+			// Enviando par�metros
+			List<NameValuePair> params = new ArrayList<>(3);
+			params.add(new BasicNameValuePair("tran", query));
+			params.add(new BasicNameValuePair("timestamp", "" + token.getTimestamp()));
+			params.add(new BasicNameValuePair("token", token.get()));
+			httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+			// Leyendo respuesta
+			HttpResponse response = httpclient.execute(httppost);
+			HttpEntity entity = response.getEntity();
+			updateMessage("Leyendo respuesta");
+			String json = EntityUtils.toString(entity);
+			System.out.println(json);
+			updateMessage("Parseando respuesta");
+			result = objectMapper.readValue(json, Result.class);
+		} catch (ConnectException ex) {
+			result.error = "No se pudo establecer una conexi\u00f3n con el servidor";
+		} catch (IOException ex) {
+			result.error = ex.getMessage();
+		}
+		return result;
+	}
 
-    private byte[] parsearPost(Map<String, Object> params) throws UnsupportedEncodingException {
-        StringBuilder postData = new StringBuilder();
-        for (Map.Entry<String, Object> param : params.entrySet()) {
-            if (postData.length() != 0) {
-                postData.append('&');
-            }
-            postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-            postData.append('=');
-            postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
-        }
-        return postData.toString().getBytes("UTF-8");
-    }
-
-    @Override
-    protected Resultado call() throws Exception {
-        updateMessage("Enviando consulta");
-        enviarConsulta();
-        return resultado;
-    }
+	@Override
+	protected Result call() throws Exception {
+		updateMessage("Enviando consulta");
+		return enviarConsulta();
+	}
 
 }
