@@ -25,12 +25,19 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import net.vjdv.baz.pe.Result.ResultPage;
+import java.text.Normalizer;
 
 /**
  *
@@ -59,8 +66,10 @@ public class ResultSetWindow {
 		MenuItem mitem3 = new MenuItem("Guardar como .csv");
 		MenuItem mitem7 = new MenuItem("Guardar como .txt");
 		Menu mitem9 = new Menu("Copiar como sql...");
+		MenuItem mitem10 = new MenuItem("Ir a columna");
 		mitem9.getItems().addAll(mitem5, mitem6, mitem8);
-		menu.getItems().addAll(mitem1, mitem2, mitem9, mitem4, new SeparatorMenuItem(), mitem3, mitem7);
+		menu.getItems().addAll(mitem1, mitem2, mitem9, mitem4, new SeparatorMenuItem(), mitem10,
+				new SeparatorMenuItem(), mitem3, mitem7);
 		tabla.setContextMenu(menu);
 		// Acciones menú
 		EventHandler<ActionEvent> listener = (ActionEvent event) -> {
@@ -153,11 +162,11 @@ public class ResultSetWindow {
 				int row = position.getRow();
 				int col = position.getColumn();
 				if (prevRow == row) {
-					clipboardString.append(",");
+					insertString.append(",");
 				} else if (prevRow != -1) {
 					break;
 				}
-				clipboardString.append(resultset.columns[col]);
+				insertString.append(resultset.columns[col]);
 				prevRow = row;
 			}
 			insertString.append(") VALUES\n(");
@@ -174,13 +183,13 @@ public class ResultSetWindow {
 				if (prevRow == row) {
 					clipboardString.append(",");
 				} else if (prevRow != -1) {
-					clipboardString.append("),\n(");
+					if (prevRow != 0 && prevRow % 500 == 0)
+						clipboardString.append(");\n").append(insertString);
+					else
+						clipboardString.append("),\n(");
 				}
 				clipboardString.append(value);
 				prevRow = row;
-				if (prevRow % 500 == 0) {
-					clipboardString.append(");\n").append(insertString);
-				}
 			}
 			clipboardString.append(");");
 			ClipboardContent clipboardContent = new ClipboardContent();
@@ -257,10 +266,37 @@ public class ResultSetWindow {
 				}
 			}
 		});
+		// Buscar columna
+		mitem10.setOnAction(actionEvent -> {
+			TextInputDialog filteringDialog = new TextInputDialog();
+			filteringDialog.setHeaderText(null);
+			filteringDialog.setTitle("Nombre de columna:");
+			filteringDialog.setContentText(null);
+			filteringDialog.initModality(Modality.NONE);
+			filteringDialog.initStyle(StageStyle.UTILITY);
+			Stage stage = (Stage) filteringDialog.getDialogPane().getScene().getWindow();
+			stage.setAlwaysOnTop(true);
+			filteringDialog.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+				String newValue2 = Normalizer.normalize(newValue, Normalizer.Form.NFD)
+						.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "").toLowerCase();
+				for (int i = 0; i < resultset.columns.length; i++) {
+					if (resultset.columns[i].toLowerCase().contains(newValue2)) {
+						tabla.scrollToColumnIndex(i);
+						break;
+					}
+				}
+			});
+			filteringDialog.show();
+		});
+		// Shortcuts
+		mitem1.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
+		mitem4.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
+		mitem5.setAccelerator(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN));
+		mitem6.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN));
+		mitem7.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
+		mitem8.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
+		mitem10.setAccelerator(new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN));
 		// Interpretado de resultado
-		// StringTokenizer lineas = new StringTokenizer(resultset, "\r\n");
-		// String l1 = lineas.nextToken();
-		// String cols[] = l1.split("\t");
 		for (int i = 0; i < resultset.columns.length; i++) {
 			final int ifinal = i;
 			TableColumn<ObservableList<Object>, Object> column = new TableColumn<>(resultset.columns[i]);
