@@ -14,6 +14,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import net.vjdv.baz.pe.Result.ResultPage;
@@ -137,6 +138,7 @@ public class InicioController implements Initializable {
 					Stage stage = new Stage();
 					stage.setScene(rsw.getScene());
 					stage.setTitle("Salida " + salida_count + " (" + rsw.getRowCount() + " registros)");
+					stage.getIcons().add(new Image("/net/vjdv/baz/pe/logoGrid.png"));
 					stage.show();
 				}
 				String log = "";
