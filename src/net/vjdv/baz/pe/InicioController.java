@@ -102,7 +102,6 @@ public class InicioController implements Initializable {
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-		System.out.println("Me gusta");
 		uriText.setText("http://10.51.42.9:8080/SITCB/procesos_especiales/");
 		uriText.addSuggestion("http://10.51.42.9:8080/SITCB/ProcesosEspeciales/");
 		uriText.addSuggestion("http://10.51.193.64:8080/SITCB/ProcesosEspeciales");

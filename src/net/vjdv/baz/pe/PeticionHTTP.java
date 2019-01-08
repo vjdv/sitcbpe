@@ -54,7 +54,6 @@ public class PeticionHTTP extends Task<Result> {
 			HttpEntity entity = response.getEntity();
 			updateMessage("Leyendo respuesta");
 			String json = EntityUtils.toString(entity);
-			System.out.println(json);
 			updateMessage("Parseando respuesta");
 			result = objectMapper.readValue(json, Result.class);
 		} catch (ConnectException ex) {
