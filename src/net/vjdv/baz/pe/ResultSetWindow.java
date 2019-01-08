@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -153,11 +154,14 @@ public class ResultSetWindow {
 		});
 		// Copiar como INSERT SQL
 		mitem5.setOnAction(actionEvent -> {
+			String tablename = prompt("Nombre de tabla:", "@TABLE");
+			if (tablename == null)
+				return;
 			StringBuilder insertString = new StringBuilder();
 			StringBuilder clipboardString = new StringBuilder();
 			ObservableList<TablePosition> positionList = tabla.getSelectionModel().getSelectedCells();
 			int prevRow = -1;
-			insertString.append("INSERT INTO @TABLE (");
+			insertString.append("INSERT INTO ").append(tablename).append("(");
 			for (TablePosition position : positionList) {
 				int row = position.getRow();
 				int col = position.getColumn();
@@ -177,8 +181,10 @@ public class ResultSetWindow {
 				int col = position.getColumn();
 				Object value = resultset.rows.get(row)[col];
 				if (value instanceof String) {
-					value = ((String) value).replaceAll("'", "'");
+					value = ((String) value).replaceAll("'", "''");
 					value = "'" + value + "'";
+				} else if (value instanceof Boolean) {
+					value = (Boolean) value ? "1" : "0";
 				}
 				if (prevRow == row) {
 					clipboardString.append(",");
@@ -198,12 +204,15 @@ public class ResultSetWindow {
 		});
 		// Copiar como UPDATE SQL
 		mitem6.setOnAction(actionEvent -> {
+			String tablename = prompt("Nombre de tabla:", "@TABLE");
+			if (tablename == null)
+				return;
 			StringBuilder clipboardString = new StringBuilder();
 			ObservableList<TablePosition> positionList = tabla.getSelectionModel().getSelectedCells();
 			int prevRow = -1;
 			for (TablePosition position : positionList) {
 				if (prevRow == -1) {
-					clipboardString.append("UPDATE @TABLE SET\n");
+					clipboardString.append("UPDATE ").append(tablename).append(" SET\n");
 				}
 				int row = position.getRow();
 				int col = position.getColumn();
@@ -213,13 +222,19 @@ public class ResultSetWindow {
 					clipboardString.append("\nWHERE 1=0\n\n");
 					break;
 				}
-				clipboardString.append(tabla.getColumns().get(col).getText()).append("=");
-				clipboardString.append("'").append(tabla.getColumns().get(col).getCellData(row)).append("'");
+				Object value = resultset.rows.get(row)[col];
+				if (value instanceof String) {
+					value = ((String) value).replaceAll("'", "''");
+					value = "'" + value + "'";
+				} else if (value instanceof Boolean) {
+					value = (Boolean) value ? "1" : "0";
+				}
+				clipboardString.append(resultset.columns[col]).append("=");
+				clipboardString.append(value);
 				prevRow = row;
 			}
-			String x = clipboardString.toString().replaceAll("'null'", "null");
 			ClipboardContent clipboardContent = new ClipboardContent();
-			clipboardContent.putString(x);
+			clipboardContent.putString(clipboardString.toString());
 			Clipboard.getSystemClipboard().setContent(clipboardContent);
 		});
 		// Copiar WHERE IN
@@ -307,7 +322,7 @@ public class ResultSetWindow {
 						super.updateItem(item, empty);
 						if (item == null && !empty) {
 							setText("null");
-							setStyle("-fx-background-color: #ffffe1");
+							setStyle("-fx-font-style: italic;");
 						} else if (!empty) {
 							setText(item.toString());
 						}
@@ -341,6 +356,18 @@ public class ResultSetWindow {
 
 	public int getRowCount() {
 		return rowcount;
+	}
+
+	private String prompt(String message, String defvalue) {
+		TextInputDialog filteringDialog = new TextInputDialog(defvalue);
+		filteringDialog.setHeaderText(null);
+		filteringDialog.setTitle(message);
+		filteringDialog.setContentText(null);
+		Optional<String> opt = filteringDialog.showAndWait();
+		if (opt.isPresent())
+			return opt.get();
+		else
+			return null;
 	}
 
 }
