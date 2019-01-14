@@ -68,8 +68,9 @@ public class ResultSetWindow {
 		MenuItem mitem7 = new MenuItem("Guardar como .txt");
 		Menu mitem9 = new Menu("Copiar como sql...");
 		MenuItem mitem10 = new MenuItem("Ir a columna");
+		MenuItem mitem11 = new MenuItem("Etiquetar ventana");
 		mitem9.getItems().addAll(mitem5, mitem6, mitem8);
-		menu.getItems().addAll(mitem1, mitem2, mitem9, mitem4, new SeparatorMenuItem(), mitem10,
+		menu.getItems().addAll(mitem1, mitem2, mitem9, mitem4, new SeparatorMenuItem(), mitem11, mitem10,
 				new SeparatorMenuItem(), mitem3, mitem7);
 		tabla.setContextMenu(menu);
 		// Acciones menú
@@ -348,6 +349,21 @@ public class ResultSetWindow {
 		AnchorPane.setRightAnchor(tabla, 0d);
 		root.getChildren().add(tabla);
 		scene = new Scene(root);
+		// Etiquetar ventana
+		mitem11.setOnAction(actionEvent -> {
+			TextInputDialog input = new TextInputDialog();
+			input.setHeaderText(null);
+			input.setTitle("Nombre de ventana:");
+			input.setContentText(null);
+			input.initModality(Modality.NONE);
+			input.initStyle(StageStyle.UTILITY);
+			Stage stage = (Stage) input.getDialogPane().getScene().getWindow();
+			stage.setAlwaysOnTop(true);
+			Optional<String> title = input.showAndWait();
+			if (title.isPresent()) {
+				((Stage) scene.getWindow()).setTitle(title.get() + " (" + resultset.rows.size() + " registros)");
+			}
+		});
 	}
 
 	public Scene getScene() {
