@@ -93,14 +93,14 @@ public class ResultSetWindow {
 					clipboardString.append("\n");
 					break;
 				}
-				clipboardString.append(resultset.rows.get(row)[col]);
+				clipboardString.append(tabla.getColumns().get(col).getText());
 				prevRow = row;
 			}
 			prevRow = -1;
 			for (TablePosition position : positionList) {
 				int row = position.getRow();
 				int col = position.getColumn();
-				Object cell = (Object) resultset.rows.get(row)[col];
+				Object cell = (Object) tabla.getColumns().get(col).getCellData(row);
 				if (cell == null) {
 					cell = "";
 				}
@@ -172,7 +172,7 @@ public class ResultSetWindow {
 				} else if (prevRow != -1) {
 					break;
 				}
-				insertString.append(resultset.columns[col]);
+				insertString.append(tabla.getColumns().get(col).getText());
 				prevRow = row;
 			}
 			insertString.append(") VALUES\n(");
@@ -181,7 +181,7 @@ public class ResultSetWindow {
 			for (TablePosition position : positionList) {
 				int row = position.getRow();
 				int col = position.getColumn();
-				Object value = resultset.rows.get(row)[col];
+				Object value = (Object) tabla.getColumns().get(col).getCellData(row);
 				if (value instanceof String) {
 					value = ((String) value).replaceAll("'", "''");
 					value = "'" + value + "'";
@@ -224,14 +224,14 @@ public class ResultSetWindow {
 					clipboardString.append("\nWHERE 1=0\n\n");
 					break;
 				}
-				Object value = resultset.rows.get(row)[col];
+				Object value = tabla.getColumns().get(col).getCellData(row);
 				if (value instanceof String) {
 					value = ((String) value).replaceAll("'", "''");
 					value = "'" + value + "'";
 				} else if (value instanceof Boolean) {
 					value = (Boolean) value ? "1" : "0";
 				}
-				clipboardString.append(resultset.columns[col]).append("=");
+				clipboardString.append(tabla.getColumns().get(col).getText()).append("=");
 				clipboardString.append(value);
 				prevRow = row;
 			}
@@ -245,14 +245,14 @@ public class ResultSetWindow {
 			StringBuilder clipboardString = new StringBuilder("WHERE ");
 			ObservableList<TablePosition> positionList = tabla.getSelectionModel().getSelectedCells();
 			int prevCol = positionList.get(0).getColumn();
-			clipboardString.append(resultset.columns[prevCol]).append(" IN(");
+			clipboardString.append(tabla.getColumns().get(prevCol).getText()).append(" IN(");
 			for (TablePosition position : positionList) {
 				int row = position.getRow();
 				int col = position.getColumn();
 				if (prevCol != col) {
 					continue;
 				}
-				Object value = resultset.rows.get(row)[col];
+				Object value = tabla.getColumns().get(col).getCellData(row);
 				if (value == null)
 					continue;
 				if (value instanceof String) {
