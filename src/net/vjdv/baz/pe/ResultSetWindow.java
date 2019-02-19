@@ -3,6 +3,8 @@ package net.vjdv.baz.pe;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,7 +40,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.vjdv.baz.pe.Result.ResultPage;
-import java.text.Normalizer;
 
 /**
  *
@@ -332,6 +333,9 @@ public class ResultSetWindow {
 			});
 			column.setCellValueFactory(param -> {
 				Object value = param.getValue().get(ifinal);
+				if (value != null && value instanceof Double) {
+					value = BigDecimal.valueOf((Double) value);
+				}
 				return new ReadOnlyObjectWrapper<>(value);
 			});
 			column.setMaxWidth(500);
