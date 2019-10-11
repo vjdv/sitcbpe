@@ -1,7 +1,5 @@
 package net.vjdv.baz.pe;
 
-import static net.vjdv.baz.pe.Util.getCurrentMachineIP;
-
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URL;
@@ -11,6 +9,7 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -39,11 +38,13 @@ public class PeticionHTTP extends Task<Result> {
 
 	public Result enviarConsulta() {
 		Result result = new Result();
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10000).build();
 		try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
 			// Creando parÃ¡metros a enviar
-			Token token = new Token("SITCB2" + getCurrentMachineIP());
+			Token token = new Token("SITCB3");
 			HttpPost httppost = new HttpPost(url.toString());
-			// Enviando parámetros
+			httppost.setConfig(requestConfig);
+			// Enviando parï¿½metros
 			List<NameValuePair> params = new ArrayList<>(3);
 			params.add(new BasicNameValuePair("tran", query));
 			params.add(new BasicNameValuePair("timestamp", "" + token.getTimestamp()));
