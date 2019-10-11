@@ -36,8 +36,6 @@ public class InicioController implements Initializable {
     @FXML
     private AutocompletionTextField uriText;
     @FXML
-    private Label info;
-    @FXML
     private Button submit;
     @FXML
     private ToggleGroup salidaGroup;
@@ -90,7 +88,7 @@ public class InicioController implements Initializable {
         Pestania tab = (Pestania) tabs.getSelectionModel().getSelectedItem();
         String param = tab.getQuery();
         PeticionHTTP peticion = new PeticionHTTP(url, param);
-        info.textProperty().bind(peticion.messageProperty());
+        submit.textProperty().bind(peticion.messageProperty());
         peticion.setOnSucceeded(rsHandler);
         new Thread(peticion).start();
     }
@@ -114,7 +112,7 @@ public class InicioController implements Initializable {
         uriText.addSuggestion("http://10.51.42.9:8080/SITCB/procesos_especiales/");
         uriText.addSuggestion("http://10.51.193.64:8080/SITCB/procesos_especiales/");
         uriText.addSuggestion("http://10.228.128.214:8080/SITCB/procesos_especiales/");
-        info.setText("");
+        submit.setText("Enviar Consulta");
     }
 
     public void onVisible() {
@@ -126,8 +124,8 @@ public class InicioController implements Initializable {
         @Override
         public void handle(WorkerStateEvent workerStateEvent) {
             submit.setDisable(false);
-            info.textProperty().unbind();
-            info.setText("");
+            submit.textProperty().unbind();
+            submit.setText("Enviar Consulta");
             Result r = ((PeticionHTTP) workerStateEvent.getSource()).getValue();
             if (r == null) {
                 alert.setContentText("Error inesperado al enviar petición");
@@ -136,7 +134,7 @@ public class InicioController implements Initializable {
                 alert.setContentText(r.error);
                 alert.showAndWait();
             } else {
-                info.setText("Mostrando resultados");
+                submit.setText("Mostrando resultados");
                 int salida_count = 0;
                 if (salidaGroup.getSelectedToggle().getUserData().equals("EXCEL")) {
                     FileExporter.excel(r);
@@ -176,7 +174,7 @@ public class InicioController implements Initializable {
                     alert.setContentText("Comando ejecutado con \u00e9xito, no se generaron salidas.");
                     alert.show();
                 }
-                info.setText("");
+                submit.setText("Enviar Consulta");
             }
         }
     }

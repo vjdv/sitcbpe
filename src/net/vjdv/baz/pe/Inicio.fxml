@@ -100,6 +100,5 @@
             </ToggleButton>
         </HBox>
         <Button fx:id="submit" layoutX="126" layoutY="90" onAction="#enviarConsulta" text="Enviar Consulta" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
-      <Label fx:id="info" layoutX="27.0" layoutY="277.0" text="Información" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" />
     </children>
 </AnchorPane>
