@@ -10,7 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,6 +63,46 @@ public class FileExporter {
         try {
             InputStream is = new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8));
             Path tmp = Files.createTempFile("salida", ".txt");
+            Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
+            Desktop.getDesktop().open(tmp.toFile());
+        } catch (IOException ex) {
+            Alert alertDialog = new Alert(Alert.AlertType.ERROR);
+            alertDialog.setContentText("Error al exportar: " + ex.getMessage());
+            alertDialog.setTitle("Error");
+            alertDialog.show();
+            Logger.getLogger("FileExporter").log(Level.WARNING, null, ex);
+        }
+    }
+
+    public static void csv(Result.ResultPage resultset) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < resultset.columns.length; i++) {
+            sb.append(resultset.columns[i]);
+            if (i != (resultset.columns.length - 1)) sb.append(",");
+        }
+        sb.append("\r\n");
+        for (Object[] datos : resultset.rows) {
+            for (int i = 0; i < datos.length; i++) {
+                if (datos[i] instanceof String) {
+                    String tmp = (String) datos[i];
+                    if (tmp.contains("\"") || tmp.contains(",")) {
+                        tmp = tmp.contains("\"") ? tmp.replaceAll("\"", "\"\"") : tmp;
+                        sb.append("\"");
+                        sb.append(tmp);
+                        sb.append("\"");
+                    } else {
+                        sb.append(datos[i]);
+                    }
+                } else {
+                    sb.append(datos[i]);
+                }
+                if (i != (datos.length - 1)) sb.append(",");
+            }
+            sb.append("\r\n");
+        }
+        try {
+            InputStream is = new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8));
+            Path tmp = Files.createTempFile("salida", ".csv");
             Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
             Desktop.getDesktop().open(tmp.toFile());
         } catch (IOException ex) {

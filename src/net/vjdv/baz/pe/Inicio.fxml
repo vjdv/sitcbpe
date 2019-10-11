@@ -83,7 +83,7 @@
             <ToggleButton text="JSON" toggleGroup="$salidaGroup" userData="JSON">
                 <tooltip><Tooltip text="Salida a JSON" /></tooltip>
             </ToggleButton>
-            <ToggleButton text="CVS" toggleGroup="$salidaGroup" userData="CSV">
+            <ToggleButton text="CSV" toggleGroup="$salidaGroup" userData="CSV">
                 <tooltip><Tooltip text="Salida a CSV" /></tooltip>
             </ToggleButton>
             <ToggleButton text="TXT" toggleGroup="$salidaGroup" userData="TXT">

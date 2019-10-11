@@ -144,6 +144,8 @@ public class InicioController implements Initializable {
                             FileExporter.json(rs);
                         } else if (salidaGroup.getSelectedToggle().getUserData().equals("TXT")) {
                             FileExporter.txt(rs);
+                        } else if (salidaGroup.getSelectedToggle().getUserData().equals("CSV")) {
+                            FileExporter.csv(rs);
                         }
                     }
                 }
