@@ -91,8 +91,7 @@ public class InicioController implements Initializable {
     @FXML
     private void ayuda() {
         Alert alertDialog = new Alert(Alert.AlertType.INFORMATION);
-        alertDialog.setContentText(
-                "Desarrollado por B187926\n\nDudas y comentarios a:\nvdiaz@elektra.com.mx\nvjdv@outlook.com");
+        alertDialog.setContentText("Desarrollado por B187926\n\nEl código está disponible en:\nhttps://github.com/vjdv/sitcbpe\n\nAhí mismo se reciben comentarios, issues o pull requests.");
         alertDialog.setHeaderText("Sobre la aplicaci\u00f3n");
         alertDialog.setTitle("Ayuda");
         alertDialog.showAndWait();
@@ -129,7 +128,7 @@ public class InicioController implements Initializable {
                 info.setText("Mostrando resultados");
                 int salida_count = 0;
                 if (salidaGroup.getSelectedToggle().getUserData().equals("EXCEL")) {
-                    // TODO
+                    FileExporter.excel(r);
                 } else {
                     for (ResultPage rs : r.pages) {
                         salida_count++;

@@ -4,9 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.scene.control.Alert;
+import org.apache.poi.hssf.usermodel.HSSFPalette;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.*;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -105,6 +110,84 @@ public class FileExporter {
             Path tmp = Files.createTempFile("salida", ".csv");
             Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
             Desktop.getDesktop().open(tmp.toFile());
+        } catch (IOException ex) {
+            Alert alertDialog = new Alert(Alert.AlertType.ERROR);
+            alertDialog.setContentText("Error al exportar: " + ex.getMessage());
+            alertDialog.setTitle("Error");
+            alertDialog.show();
+            Logger.getLogger("FileExporter").log(Level.WARNING, null, ex);
+        }
+    }
+
+    public static void excel(Result result) {
+        //Creando libro
+        HSSFWorkbook wb = new HSSFWorkbook();
+        //Estilos encabezado
+        HSSFPalette palette = wb.getCustomPalette();
+        palette.setColorAtIndex(IndexedColors.DARK_BLUE.index, (byte) 28, (byte) 43, (byte) 54);
+        Font headerFont = wb.createFont();
+        headerFont.setBold(true);
+        headerFont.setColor(IndexedColors.WHITE.getIndex());
+        CellStyle headerStyle = wb.createCellStyle();
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.index);
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        //Estilos cuerpo
+        Font bodyFont = wb.createFont();
+        bodyFont.setBold(false);
+        CellStyle bodyStyle = wb.createCellStyle();
+        bodyStyle.setFont(bodyFont);
+        Font kFont = wb.createFont();
+        kFont.setBold(false);
+        kFont.setItalic(true);
+        CellStyle kStyle = wb.createCellStyle();
+        kStyle.setFont(kFont);
+        //Agregando hojas
+        for (int x = 0; x < result.pages.size(); x++) {
+            Result.ResultPage resultset = result.pages.get(x);
+            Sheet s = wb.createSheet("Salida" + (x + 1));
+            //Encabezado
+            Row headerRow = s.createRow(0);
+            for (int i = 0; i < resultset.columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellStyle(headerStyle);
+                cell.setCellValue(resultset.columns[i]);
+            }
+            //Cuerpo
+            int count = 1;
+            for (Object[] datos : resultset.rows) {
+                Row row = s.createRow(count);
+                for (int i = 0; i < datos.length; i++) {
+                    Cell cell = row.createCell(i);
+                    if (datos[i] == null) {
+                        cell.setCellValue("null");
+                        cell.setCellStyle(kStyle);
+                    } else if (datos[i] instanceof String) {
+                        cell.setCellValue((String) datos[i]);
+                    } else if (datos[i] instanceof BigDecimal) {
+                        cell.setCellValue(((BigDecimal) datos[i]).doubleValue());
+                    } else if (datos[i] instanceof Boolean) {
+                        cell.setCellValue(datos[i].toString());
+                        cell.setCellStyle(kStyle);
+                    } else if (datos[i] instanceof Integer) {
+                        cell.setCellValue((Integer) datos[i]);
+                    } else if (datos[i] instanceof Double) {
+                        cell.setCellValue((Double) datos[i]);
+                    } else {
+                        cell.setCellValue(datos[i].toString());
+                    }
+                }
+                count++;
+            }
+            //Autosize
+            for (int i = 0; i < s.getRow(0).getPhysicalNumberOfCells(); i++) {
+                s.autoSizeColumn(i);
+            }
+        }
+        try {
+            File tmp = File.createTempFile("salida", ".xls");
+            wb.write(tmp);
+            Desktop.getDesktop().open(tmp);
         } catch (IOException ex) {
             Alert alertDialog = new Alert(Alert.AlertType.ERROR);
             alertDialog.setContentText("Error al exportar: " + ex.getMessage());

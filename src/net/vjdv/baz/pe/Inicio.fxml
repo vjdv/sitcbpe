@@ -68,10 +68,19 @@
       </HBox>
       <TabPane fx:id="tabs" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="54.0" />
         <fx:define>
+            <Image fx:id="excelImage" url="/net/vjdv/baz/pe/excel.png"  />
             <Image fx:id="tableImage" url="/net/vjdv/baz/pe/logoGrid.png"  />
             <ToggleGroup fx:id="salidaGroup"/>
         </fx:define>
         <HBox AnchorPane.leftAnchor="5.0" AnchorPane.bottomAnchor="5.0" spacing="3">
+            <ToggleButton toggleGroup="$salidaGroup" userData="EXCEL">
+                <graphic>
+                    <ImageView image="$excelImage" fitWidth="16" fitHeight="16" />
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Salida a excel" />
+                </tooltip>
+            </ToggleButton>
             <ToggleButton toggleGroup="$salidaGroup" selected="true" userData="TABLA">
                 <graphic>
                     <ImageView image="$tableImage" fitWidth="16" fitHeight="16" />
