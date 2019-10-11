@@ -1,30 +1,29 @@
 package net.vjdv.baz.pe;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import net.vjdv.baz.pe.Result.ResultPage;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 /**
- *
  * @author B187926
  */
 public class InicioController implements Initializable {
 
+    // Variables
+    private final FileChooser filechooser = new FileChooser();
+    private final ResultsHandler rsHandler = new ResultsHandler();
     @FXML
     private TabPane tabs;
     @FXML
@@ -33,9 +32,8 @@ public class InicioController implements Initializable {
     private Label info;
     @FXML
     private Button submit;
-    // Variables
-    private final FileChooser filechooser = new FileChooser();
-    private final ResultsHandler rsHandler = new ResultsHandler();
+    @FXML
+    private ToggleGroup salidaGroup;
     private Alert alert;
     private URL url;
 
@@ -130,14 +128,22 @@ public class InicioController implements Initializable {
             } else {
                 info.setText("Mostrando resultados");
                 int salida_count = 0;
-                for (ResultPage rs : r.pages) {
-                    salida_count++;
-                    ResultSetWindow rsw = new ResultSetWindow(rs);
-                    Stage stage = new Stage();
-                    stage.setScene(rsw.getScene());
-                    stage.setTitle("Salida " + salida_count + " (" + rsw.getRowCount() + " registros)");
-                    stage.getIcons().add(new Image("/net/vjdv/baz/pe/logoGrid.png"));
-                    stage.show();
+                if (salidaGroup.getSelectedToggle().getUserData().equals("EXCEL")) {
+                    // TODO
+                } else {
+                    for (ResultPage rs : r.pages) {
+                        salida_count++;
+                        if (salidaGroup.getSelectedToggle().getUserData().equals("TABLA")) {
+                            Stage stage = new Stage();
+                            ResultSetWindow rsw = new ResultSetWindow(rs);
+                            stage.setScene(rsw.getScene());
+                            stage.setTitle("Salida " + salida_count + " (" + rsw.getRowCount() + " registros)");
+                            stage.getIcons().add(new Image("/net/vjdv/baz/pe/logoGrid.png"));
+                            stage.show();
+                        } else if (salidaGroup.getSelectedToggle().getUserData().equals("JSON")) {
+                            FileExporter.json(rs);
+                        }
+                    }
                 }
                 String log = "";
                 for (int i : r.affected) {
@@ -159,7 +165,6 @@ public class InicioController implements Initializable {
                 info.setText("");
             }
         }
-
     }
 
 }
