@@ -1,7 +1,8 @@
 .gradle
+.idea
+.nb-gradle
 .settings
 .vscode
 bin
-build/classes
-build/resources
-build/tmp
+build
+out
