@@ -142,6 +142,8 @@ public class InicioController implements Initializable {
                             stage.show();
                         } else if (salidaGroup.getSelectedToggle().getUserData().equals("JSON")) {
                             FileExporter.json(rs);
+                        } else if (salidaGroup.getSelectedToggle().getUserData().equals("TXT")) {
+                            FileExporter.txt(rs);
                         }
                     }
                 }
