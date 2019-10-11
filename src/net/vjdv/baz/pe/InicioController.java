@@ -5,15 +5,22 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import net.vjdv.baz.pe.Result.ResultPage;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -89,12 +96,16 @@ public class InicioController implements Initializable {
     }
 
     @FXML
-    private void ayuda() {
-        Alert alertDialog = new Alert(Alert.AlertType.INFORMATION);
-        alertDialog.setContentText("Desarrollado por B187926\n\nEl código está disponible en:\nhttps://github.com/vjdv/sitcbpe\n\nAhí mismo se reciben comentarios, issues o pull requests.");
+    private void ayuda() throws URISyntaxException, IOException {
+        ButtonType repo = new ButtonType("Ir a Github", ButtonBar.ButtonData.HELP);
+        ButtonType cerrar = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+        Alert alertDialog = new Alert(Alert.AlertType.INFORMATION, "Desarrollado por B187926\n\nEl código está disponible en:\nhttps://github.com/vjdv/sitcbpe\n\nAhí mismo se reciben comentarios, issues o pull requests.", cerrar, repo);
         alertDialog.setHeaderText("Sobre la aplicaci\u00f3n");
         alertDialog.setTitle("Ayuda");
-        alertDialog.showAndWait();
+        Optional<ButtonType> result = alertDialog.showAndWait();
+        if (result.orElse(cerrar) == repo) {
+            Desktop.getDesktop().browse(new URI("https://github.com/vjdv/sitcbpe"));
+        }
     }
 
     @Override

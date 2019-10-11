@@ -52,7 +52,7 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Ayuda">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#ayuda" text="Ayúdate y te ayudaré" />
+              <MenuItem mnemonicParsing="false" onAction="#ayuda" text="Acerca de la aplicación" />
             </items>
           </Menu>
         </menus>
