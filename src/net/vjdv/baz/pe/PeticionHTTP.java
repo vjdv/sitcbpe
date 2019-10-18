@@ -41,7 +41,7 @@ public class PeticionHTTP extends Task<Result> {
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10000).build();
 		try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
 			// Creando parámetros a enviar
-			Token token = new Token("SITCB3");
+			Token token = new Token("SITBAZ");
 			HttpPost httppost = new HttpPost(url.toString());
 			httppost.setConfig(requestConfig);
 			// Enviando par�metros

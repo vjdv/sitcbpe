@@ -39,10 +39,10 @@ jar {
 task fatJar(type: Jar) {
 	manifest {
         attributes 'Implementation-Title': 'ProcesosEspeciales',  
-        	'Implementation-Version': version,
+        	'Implementation-Version': project.version,
         	'Main-Class': 'net.vjdv.baz.pe.Main'
     }
-    baseName = project.name + '-all'
+	archivesBaseName = "sitbazpe-all"
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }

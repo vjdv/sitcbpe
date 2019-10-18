@@ -1,8 +1,8 @@
 .bgcolored {
-  -fx-background-color: #512d6d;
+  -fx-background-color: #046240;
 }
 .tab-pane *.tab-header-background  {
-  -fx-background-color: #512d6d;
+  -fx-background-color: #046240;
 }
 .ftwhite {
   -fx-text-fill: #ffffff;
