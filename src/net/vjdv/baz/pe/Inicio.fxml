@@ -18,7 +18,8 @@
 <?import net.vjdv.baz.pe.AutocompletionTextField?>
 
 <?import javafx.scene.control.ToggleButton?>
-<AnchorPane id="AnchorPane" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.vjdv.baz.pe.InicioController">
+<?import java.net.URL?>
+<AnchorPane id="AnchorPane" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.vjdv.baz.pe.InicioController" stylesheets="/net/vjdv/baz/pe/estilo.css"  styleClass="bgcolored">
     <children>
       <MenuBar AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
@@ -59,8 +60,8 @@
       </MenuBar>
       <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="24.0">
          <children>
-            <Label minWidth="50.0" text="Servidor:" />
-            <AutocompletionTextField fx:id="uriText" prefWidth="1000.0" />
+            <Label minWidth="50.0" text="Servidor:" styleClass="ftwhite"/>
+            <AutocompletionTextField fx:id="uriText" prefWidth="2000.0" />
          </children>
          <padding>
             <Insets left="5.0" right="5.0" />
