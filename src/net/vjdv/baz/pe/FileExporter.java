@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 public class FileExporter {
 
-    private static ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     public static void json(Result.ResultPage resultset) {
         ArrayNode s = mapper.createArrayNode();
@@ -32,10 +32,10 @@ public class FileExporter {
             Object[] objs = resultset.rows.get(i);
             ObjectNode o = s.addObject();
             for (int j = 0; j < resultset.columns.length; j++) {
-                if (objs[j] instanceof String) o.put(resultset.columns[j], (String) objs[j]);
-                if (objs[j] instanceof Integer) o.put(resultset.columns[j], (Integer) objs[j]);
-                if (objs[j] instanceof BigDecimal) o.put(resultset.columns[j], (BigDecimal) objs[j]);
-                if (objs[j] instanceof Boolean) o.put(resultset.columns[j], (Boolean) objs[j]);
+                if (objs[j] instanceof String) o.put(resultset.columns[j].descripcion, (String) objs[j]);
+                if (objs[j] instanceof Integer) o.put(resultset.columns[j].descripcion, (Integer) objs[j]);
+                if (objs[j] instanceof BigDecimal) o.put(resultset.columns[j].descripcion, (BigDecimal) objs[j]);
+                if (objs[j] instanceof Boolean) o.put(resultset.columns[j].descripcion, (Boolean) objs[j]);
             }
         }
         try {
@@ -151,7 +151,7 @@ public class FileExporter {
             for (int i = 0; i < resultset.columns.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellStyle(headerStyle);
-                cell.setCellValue(resultset.columns[i]);
+                cell.setCellValue(resultset.columns[i].descripcion);
             }
             //Cuerpo
             int count = 1;

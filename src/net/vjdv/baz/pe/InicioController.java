@@ -6,7 +6,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
@@ -108,10 +107,11 @@ public class InicioController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        uriText.setText("http://10.228.128.214:8080/SITCB/procesos_especiales/");
-        uriText.addSuggestion("http://10.51.42.9:8080/SITCB/procesos_especiales/");
-        uriText.addSuggestion("http://10.51.193.64:8080/SITCB/procesos_especiales/");
-        uriText.addSuggestion("http://10.228.128.214:8080/SITCB/procesos_especiales/");
+        uriText.setText("https://10.63.14.79:9080/apis/excel/procesos_especiales/");
+        uriText.addSuggestion("https://10.63.14.79:9080/apis/excel/procesos_especiales/");
+        uriText.addSuggestion("http://10.82.29.16:8080/apis/excel/procesos_especiales/");
+        uriText.addSuggestion("http://10.82.29.16:8080/apis/excel/procesos_especiales/");
+        uriText.addSuggestion("http://localhost:8582/apis/excel/procesos_especiales/");
         submit.setText("Enviar Consulta");
     }
 

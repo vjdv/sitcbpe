@@ -251,7 +251,7 @@ public class ResultSetWindow {
                 String newValue2 = Normalizer.normalize(newValue, Normalizer.Form.NFD)
                         .replaceAll("[\\p{InCombiningDiacriticalMarks}]", "").toLowerCase();
                 for (int i = 0; i < resultset.columns.length; i++) {
-                    if (resultset.columns[i].toLowerCase().contains(newValue2)) {
+                    if (resultset.columns[i].descripcion.toLowerCase().contains(newValue2)) {
                         tabla.scrollToColumnIndex(i);
                         break;
                     }
@@ -297,7 +297,7 @@ public class ResultSetWindow {
         // Interpretado de resultado
         for (int i = 0; i < resultset.columns.length; i++) {
             final int ifinal = i;
-            TableColumn<ObservableList<Object>, Object> column = new TableColumn<>(resultset.columns[i]);
+            TableColumn<ObservableList<Object>, Object> column = new TableColumn<>(resultset.columns[i].descripcion);
             column.setCellFactory(col -> {
                 return new TableCell<ObservableList<Object>, Object>() {
                     @Override
